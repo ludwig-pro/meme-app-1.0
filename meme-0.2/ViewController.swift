@@ -136,8 +136,9 @@ class ViewController: UIViewController,  UIImagePickerControllerDelegate, UINavi
   }
   
   @objc func keyboardWillShow(_ notification:Notification) {
-    
+    if(bottomText.isEditing){
     view.frame.origin.y -= getKeyboardHeight(notification)
+    }
   }
   
   @objc func keyboardWillHide(_ notification:Notification) {
@@ -180,7 +181,7 @@ class ViewController: UIViewController,  UIImagePickerControllerDelegate, UINavi
     NSAttributedString.Key.strokeColor: UIColor.black ,
     NSAttributedString.Key.foregroundColor: UIColor.systemPink,
     NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
-    NSAttributedString.Key.strokeWidth:  3.0,
+    NSAttributedString.Key.strokeWidth:  -3.2,
   ]
 
   
