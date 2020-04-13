@@ -25,9 +25,7 @@ class ViewController: UIViewController,  UIImagePickerControllerDelegate, UINavi
   }
   
   // Delegate object
-  //  let pickerDelegate = ImagePickerDelegate()
-  func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]){
-    
+  func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]){    
     if let image = info[.originalImage] as? UIImage {
       imagePickView.image = image
       share.isEnabled = true
@@ -60,18 +58,8 @@ class ViewController: UIViewController,  UIImagePickerControllerDelegate, UINavi
   override func viewDidLoad() {
     super.viewDidLoad()
     // Do any additional setup after loading the view.
-    topText.text = "TOP"
-    topText.textAlignment = .center
-    topText.defaultTextAttributes = memeTextAttributes
-    topText.textColor = UIColor.systemPink
-    bottomText.text = "BOTTOM"
-    bottomText.textAlignment = .center
-    bottomText.defaultTextAttributes = memeTextAttributes
-    bottomText.textColor = UIColor.systemPink
-    
-    bottomText.delegate = self
-    topText.delegate = self
-    
+    configureTextField(topText, text: "TOP")
+    configureTextField(bottomText, text: "BOTTOM")
 
   }
   
@@ -91,19 +79,20 @@ class ViewController: UIViewController,  UIImagePickerControllerDelegate, UINavi
   // UI Method
   
   @IBAction func pickImage(_ sender: Any) {
-    let pickerController = UIImagePickerController()
-    pickerController.delegate = self
-    pickerController.sourceType = .photoLibrary
-    present(pickerController, animated: true, completion: nil)
+    getImagePicker(.photoLibrary)
   }
   
   @IBAction func pickCamera(_ sender: Any) {
-    let pickerController = UIImagePickerController()
-    pickerController.delegate = self
-    pickerController.sourceType = .camera
-    present(pickerController, animated: true, completion: nil)
+    getImagePicker(.camera)
   }
   
+  func getImagePicker(_ source: UIImagePickerController.SourceType){
+    let pickerController = UIImagePickerController()
+    pickerController.delegate = self
+    pickerController.sourceType = source
+    present(pickerController, animated: true, completion: nil)
+  }
+    
   @IBAction func shareMeme(_ sender: Any) {
 //    generate a memed image
     let meme = generateMemedImage()
@@ -142,7 +131,6 @@ class ViewController: UIViewController,  UIImagePickerControllerDelegate, UINavi
   }
   
   @objc func keyboardWillHide(_ notification:Notification) {
-    
     view.frame.origin.y = 0
   }
   
@@ -152,7 +140,7 @@ class ViewController: UIViewController,  UIImagePickerControllerDelegate, UINavi
     let keyboardSize = userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue // of CGRect
     return keyboardSize.cgRectValue.height
   }
-    // meme saver
+
   func save() {
     // Create the meme
     _ = Meme(topText: topText.text!, bottomText: bottomText.text!, original: imagePickView.image!, memedImage: generateMemedImage())
@@ -179,10 +167,18 @@ class ViewController: UIViewController,  UIImagePickerControllerDelegate, UINavi
   // Style
   let memeTextAttributes: [NSAttributedString.Key: Any] = [
     NSAttributedString.Key.strokeColor: UIColor.black ,
-    NSAttributedString.Key.foregroundColor: UIColor.systemPink,
+    NSAttributedString.Key.foregroundColor: UIColor.white,
     NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
     NSAttributedString.Key.strokeWidth:  -3.2,
   ]
+  
+  func configureTextField(_ textField: UITextField, text: String) {
+    textField.delegate = self
+    textField.text = text
+    textField.defaultTextAttributes = memeTextAttributes
+    textField.textAlignment = .center
+
+  }
 
   
   
