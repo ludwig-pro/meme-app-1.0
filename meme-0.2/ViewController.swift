@@ -9,20 +9,22 @@
 import UIKit
 import Photos
 
+struct Meme {
+  var topText: String;
+  var bottomText: String;
+  var original: UIImage;
+  var memedImage: UIImage;
+}
+
 class ViewController: UIViewController,  UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate  {
 
+  @IBOutlet weak var toolBar: UIToolbar!
   @IBOutlet weak var imagePickView: UIImageView!
   @IBOutlet weak var cameraButton: UIBarButtonItem!
   @IBOutlet weak var topText: UITextField!
   @IBOutlet weak var bottomText: UITextField!
   @IBOutlet weak var share: UIBarButtonItem!
   
-  struct Meme {
-    var topText: String;
-    var bottomText: String;
-    var original: UIImage;
-    var memedImage: UIImage;
-  }
   
   // Delegate object
   func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]){    
@@ -60,13 +62,16 @@ class ViewController: UIViewController,  UIImagePickerControllerDelegate, UINavi
     // Do any additional setup after loading the view.
     configureTextField(topText, text: "TOP")
     configureTextField(bottomText, text: "BOTTOM")
+    self.tabBarController?.tabBar.isHidden = true
 
   }
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+    self.tabBarController?.tabBar.isHidden = true
     subscribeToKeyboardNotifications()
-    share.isEnabled = false
+    imagePickView.image == nil ? (share.isEnabled = false ): (share.isEnabled = true)
+    
     cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
   }
   
@@ -74,6 +79,7 @@ class ViewController: UIViewController,  UIImagePickerControllerDelegate, UINavi
     
     super.viewWillDisappear(animated)
     unsubscribeFromKeyboardNotifications()
+    self.tabBarController?.tabBar.isHidden = false
   }
   
   // UI Method
@@ -107,8 +113,7 @@ class ViewController: UIViewController,  UIImagePickerControllerDelegate, UINavi
     present(activity, animated: true, completion: nil)
 
   }
-  
-  
+
   
   // Class Method
     // keyboard
@@ -143,13 +148,19 @@ class ViewController: UIViewController,  UIImagePickerControllerDelegate, UINavi
 
   func save() {
     // Create the meme
-    _ = Meme(topText: topText.text!, bottomText: bottomText.text!, original: imagePickView.image!, memedImage: generateMemedImage())
+    let meme = Meme(topText: topText.text!, bottomText: bottomText.text!, original: imagePickView.image!, memedImage: generateMemedImage())
+    
+    // Add it to the memes array in the Application Delegate
+    print("save in progress")
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    appDelegate.memes.append(meme)
 
   }
   
   func generateMemedImage() -> UIImage {
     self.tabBarController?.tabBar.isHidden = true
     self.navigationController?.navigationBar.isHidden = true
+    toolBar.isHidden = true
     
     // Render view to an image
     UIGraphicsBeginImageContext(self.view.frame.size)
@@ -157,9 +168,9 @@ class ViewController: UIViewController,  UIImagePickerControllerDelegate, UINavi
     let memedImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
     UIGraphicsEndImageContext()
     
-    self.tabBarController?.tabBar.isHidden = false
+    self.tabBarController?.tabBar.isHidden = true
     self.navigationController?.navigationBar.isHidden = false
-    
+    toolBar.isHidden = false
     return memedImage
   }
 
